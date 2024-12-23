@@ -9,6 +9,8 @@ import com.personalrchabane.videogame_library_backend.repository.game.GameStudio
 import com.personalrchabane.videogame_library_backend.repository.game.PlatformRepository;
 import com.personalrchabane.videogame_library_backend.repository.game.GameRepository;
 import com.personalrchabane.videogame_library_backend.service.game.GameService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -56,24 +58,32 @@ public class GameServiceImpl implements GameService {
      * - /api/games?platforms=PC,PlayStation 4&sort=name,asc
      */
     @Override
-    public List<GameOutDTO> findFilteredAndSortedGames(String name, String genre, Integer releaseYear, String studioName, List<String> platforms, String sort) {
-        // Décomposer le tri
-        String[] sortParams = sort.split(",");
-        String sortField = sortParams[0];
-        Sort.Direction direction = sortParams.length > 1 && sortParams[1].equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+    public Page<GameOutDTO> findFilteredAndSortedGames(String name, String genre, Integer releaseYear, String studioName, List<String> platforms, String sort, Pageable pageable) {
+        // Appliquer les filtres de manière dynamique
+        Page<Game> filteredGames = gameRepository.findAll((root, query, cb) -> {
+            var predicates = cb.conjunction();
 
-        // Appliquer les filtres et le tri
-        List<Game> games = gameRepository.findAll(Sort.by(direction, sortField)).stream()
-                .filter(game -> name == null || game.getName().toLowerCase().contains(name.toLowerCase()))
-                .filter(game -> genre == null || game.getGenre().equalsIgnoreCase(genre))
-                .filter(game -> releaseYear == null || game.getReleaseYear() == releaseYear)
-                .filter(game -> studioName == null || game.getStudio().getName().equalsIgnoreCase(studioName))
-                .filter(game -> platforms == null || game.getPlatforms().stream()
-                        .anyMatch(platform -> platforms.contains(platform.getName())))
-                .toList();
+            if (name != null) {
+                predicates = cb.and(predicates, cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
+            }
+            if (genre != null) {
+                predicates = cb.and(predicates, cb.equal(cb.lower(root.get("genre")), genre.toLowerCase()));
+            }
+            if (releaseYear != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("releaseYear"), releaseYear));
+            }
+            if (studioName != null) {
+                predicates = cb.and(predicates, cb.equal(cb.lower(root.get("studio").get("name")), studioName.toLowerCase()));
+            }
+            if (platforms != null && !platforms.isEmpty()) {
+                predicates = cb.and(predicates, root.join("platforms").get("name").in(platforms));
+            }
 
-        // Convertir les entités en DTOs
-        return games.stream().map(gameMapper::toGameOutDTO).toList();
+            return predicates;
+        }, pageable);
+
+        // Convertir en DTO
+        return filteredGames.map(gameMapper::toGameOutDTO);
     }
 
     @Override
