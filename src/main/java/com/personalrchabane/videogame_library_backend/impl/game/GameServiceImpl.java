@@ -3,6 +3,7 @@ package com.personalrchabane.videogame_library_backend.impl.game;
 import com.personalrchabane.videogame_library_backend.dto.game.in.GameCreateDTO;
 import com.personalrchabane.videogame_library_backend.dto.game.out.GameOutDTO;
 import com.personalrchabane.videogame_library_backend.mapper.game.GameMapper;
+import com.personalrchabane.videogame_library_backend.model.game.GameStudio;
 import com.personalrchabane.videogame_library_backend.model.game.Platform;
 import com.personalrchabane.videogame_library_backend.model.game.Game;
 import com.personalrchabane.videogame_library_backend.repository.game.GameStudioRepository;
@@ -11,7 +12,6 @@ import com.personalrchabane.videogame_library_backend.repository.game.GameReposi
 import com.personalrchabane.videogame_library_backend.service.game.GameService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,13 +31,6 @@ public class GameServiceImpl implements GameService {
         this.gameStudioRepository = gameStudioRepository;
         this.platformRepository = platformRepository;
         this.gameMapper = gameMapper;
-    }
-
-    @Override
-    public List<GameOutDTO> findAllGames() {
-        return gameRepository.findAll().stream()
-                .map(gameMapper::toGameOutDTO)
-                .toList();
     }
 
     /**
@@ -99,5 +92,41 @@ public class GameServiceImpl implements GameService {
         game.setPlatforms(Set.copyOf(platforms));
 
         return gameMapper.toGameOutDTO(gameRepository.save(game));
+    }
+
+    @Override
+    public GameOutDTO updateGame(Long id, GameCreateDTO gameCreateDTO) {
+        // Vérifie si le jeu existe
+        Game game = gameRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Game with ID " + id + " not found"));
+
+        // Met à jour les données du jeu
+        game.setName(gameCreateDTO.getName());
+        game.setGenre(gameCreateDTO.getGenre());
+        game.setReleaseYear(gameCreateDTO.getReleaseYear());
+
+        // Associe le studio
+        GameStudio studio = gameStudioRepository.findById(gameCreateDTO.getStudioId())
+                .orElseThrow(() -> new IllegalArgumentException("Studio with ID " + gameCreateDTO.getStudioId() + " not found"));
+        game.setStudio(studio);
+
+        // Associe les plateformes
+        List<Platform> platforms = platformRepository.findAllById(gameCreateDTO.getPlatformIds());
+        if (platforms.size() != gameCreateDTO.getPlatformIds().size()) {
+            throw new IllegalArgumentException("One or more platforms not found");
+        }
+        game.setPlatforms(Set.copyOf(platforms));
+
+        // Sauvegarde et retourne le DTO
+        return gameMapper.toGameOutDTO(gameRepository.save(game));
+    }
+
+    @Override
+    public void deleteGame(Long id) {
+        // Vérifie si le jeu existe
+        if (!gameRepository.existsById(id)) {
+            throw new IllegalArgumentException("Game with ID " + id + " not found");
+        }
+        gameRepository.deleteById(id);
     }
 }

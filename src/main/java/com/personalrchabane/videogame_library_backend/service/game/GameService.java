@@ -8,8 +8,8 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface GameService {
-    List<GameOutDTO> findAllGames();
-    //List<GameOutDTO> findFilteredAndSortedGames(String name, String genre, Integer releaseYear, String studioName, List<String> platforms, String sort);
     Page<GameOutDTO> findFilteredAndSortedGames(String name, String genre, Integer releaseYear, String studioName, List<String> platforms, String sort, Pageable pageable);
     GameOutDTO saveGame(GameCreateDTO gameCreateDTO);
+    GameOutDTO updateGame(Long id, GameCreateDTO gameCreateDTO);
+    void deleteGame(Long id);
 }
