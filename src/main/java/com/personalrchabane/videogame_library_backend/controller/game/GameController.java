@@ -38,7 +38,7 @@ public class GameController {
             @RequestParam(required = false) Integer releaseYear,
             @RequestParam(required = false) String studioName,
             @RequestParam(required = false) List<String> platforms,
-            @RequestParam(defaultValue = "id,asc") String sort,
+            @RequestParam(defaultValue = "name,asc") String sort,
             @PageableDefault() Pageable pageable) {
 
         Pageable updatedPageable = Pageable.ofSize(defaultPageSize).withPage(pageable.getPageNumber());
@@ -46,6 +46,16 @@ public class GameController {
         return ResponseEntity.ok(
                 gameService.findFilteredAndSortedGames(name, genre, releaseYear, studioName, platforms, sort, updatedPageable)
         );
+    }
+
+    @GetMapping("/years")
+    public ResponseEntity<List<Integer>> getAllUniqueReleaseYears() {
+        return ResponseEntity.ok(gameService.findAllUniqueReleaseYears());
+    }
+
+    @GetMapping("/genres")
+    public ResponseEntity<List<String>> getAllUniqueGenres() {
+        return ResponseEntity.ok(gameService.findAllUniqueGenres());
     }
 
     @PostMapping

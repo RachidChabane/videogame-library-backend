@@ -11,7 +11,9 @@ import com.personalrchabane.videogame_library_backend.repository.game.PlatformRe
 import com.personalrchabane.videogame_library_backend.repository.game.GameRepository;
 import com.personalrchabane.videogame_library_backend.service.game.GameService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -52,6 +54,18 @@ public class GameServiceImpl implements GameService {
      */
     @Override
     public Page<GameOutDTO> findFilteredAndSortedGames(String name, String genre, Integer releaseYear, String studioName, List<String> platforms, String sort, Pageable pageable) {
+        // Parser les param de sorting
+        String[] sortParams = sort.split(",");
+        String sortField = sortParams[0];
+        String sortDirection = sortParams.length > 1 ? sortParams[1] : "asc";
+
+        // Créer l'objet de sorting
+        Sort.Direction direction = sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sorting = Sort.by(direction, sortField);
+
+        // Appliquer le sorting au pageable
+        Pageable pageableWithSort = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sorting);
+
         // Appliquer les filtres de manière dynamique
         Page<Game> filteredGames = gameRepository.findAll((root, query, cb) -> {
             var predicates = cb.conjunction();
@@ -73,9 +87,8 @@ public class GameServiceImpl implements GameService {
             }
 
             return predicates;
-        }, pageable);
+        }, pageableWithSort); // Utiliser le pageable avec le sorting
 
-        // Convertir en DTO
         return filteredGames.map(gameMapper::toGameOutDTO);
     }
 
@@ -128,5 +141,15 @@ public class GameServiceImpl implements GameService {
             throw new IllegalArgumentException("Game with ID " + id + " not found");
         }
         gameRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Integer> findAllUniqueReleaseYears() {
+        return gameRepository.findAllUniqueReleaseYears();
+    }
+
+    @Override
+    public List<String> findAllUniqueGenres() {
+        return gameRepository.findAllUniqueGenres();
     }
 }

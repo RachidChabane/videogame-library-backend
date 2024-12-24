@@ -12,4 +12,8 @@ public interface GameService {
     GameOutDTO saveGame(GameCreateDTO gameCreateDTO);
     GameOutDTO updateGame(Long id, GameCreateDTO gameCreateDTO);
     void deleteGame(Long id);
+
+    List<Integer> findAllUniqueReleaseYears();
+
+    List<String> findAllUniqueGenres();
 }
