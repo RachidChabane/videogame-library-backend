@@ -1,6 +1,6 @@
 package com.personalrchabane.videogame_library_backend.impl.auth;
 
-import com.personalrchabane.videogame_library_backend.service.auth.AuthService;
+import com.personalrchabane.videogame_library_backend.service.auth.TokenService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -12,7 +12,7 @@ import java.security.Key;
 import java.util.Date;
 
 @Service
-public class JwtAuthService implements AuthService {
+public class JwtTokenService implements TokenService {
     @Value("${jwt.secret}")
     private String secretKey;
 

@@ -1,6 +1,6 @@
 package com.personalrchabane.videogame_library_backend.config.security;
 
-import com.personalrchabane.videogame_library_backend.service.auth.AuthService;
+import com.personalrchabane.videogame_library_backend.service.auth.TokenService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -21,15 +21,15 @@ import java.io.IOException;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
-    private final AuthService authService;
+    private final TokenService tokenService;
     private final UserDetailsService userDetailsService;
 
     @Value("${jwt.secret}")
     private String secretKey;
 
     @Autowired
-    public JwtAuthFilter(AuthService authService, UserDetailsService userDetailsService) {
-        this.authService = authService;
+    public JwtAuthFilter(TokenService tokenService, UserDetailsService userDetailsService) {
+        this.tokenService = tokenService;
         this.userDetailsService = userDetailsService;
     }
 
@@ -46,7 +46,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         final String jwt = authHeader.substring(7);
-        if (authService.validateToken(jwt)) {
+        if (tokenService.validateToken(jwt)) {
             String username = extractUsernameFromToken(jwt);
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
