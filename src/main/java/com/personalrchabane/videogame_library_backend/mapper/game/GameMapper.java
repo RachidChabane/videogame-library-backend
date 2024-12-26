@@ -2,11 +2,12 @@ package com.personalrchabane.videogame_library_backend.mapper.game;
 
 import com.personalrchabane.videogame_library_backend.dto.game.in.GameCreateDTO;
 import com.personalrchabane.videogame_library_backend.dto.game.out.GameOutDTO;
-import com.personalrchabane.videogame_library_backend.model.game.Platform;
 import com.personalrchabane.videogame_library_backend.model.game.Game;
+import com.personalrchabane.videogame_library_backend.model.game.Platform;
 import org.mapstruct.Mapper;
-import org.mapstruct.Named;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 

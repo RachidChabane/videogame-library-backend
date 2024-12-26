@@ -3,12 +3,12 @@ package com.personalrchabane.videogame_library_backend.impl.game;
 import com.personalrchabane.videogame_library_backend.dto.game.in.GameCreateDTO;
 import com.personalrchabane.videogame_library_backend.dto.game.out.GameOutDTO;
 import com.personalrchabane.videogame_library_backend.mapper.game.GameMapper;
+import com.personalrchabane.videogame_library_backend.model.game.Game;
 import com.personalrchabane.videogame_library_backend.model.game.GameStudio;
 import com.personalrchabane.videogame_library_backend.model.game.Platform;
-import com.personalrchabane.videogame_library_backend.model.game.Game;
+import com.personalrchabane.videogame_library_backend.repository.game.GameRepository;
 import com.personalrchabane.videogame_library_backend.repository.game.GameStudioRepository;
 import com.personalrchabane.videogame_library_backend.repository.game.PlatformRepository;
-import com.personalrchabane.videogame_library_backend.repository.game.GameRepository;
 import com.personalrchabane.videogame_library_backend.service.game.GameService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -90,6 +90,12 @@ public class GameServiceImpl implements GameService {
         }, pageableWithSort); // Utiliser le pageable avec le sorting
 
         return filteredGames.map(gameMapper::toGameOutDTO);
+    }
+
+    @Override
+    public GameOutDTO findGameById(Long id) {
+        return gameMapper.toGameOutDTO(gameRepository.findById(id)
+                        .orElseThrow(() -> new IllegalArgumentException("Game with ID " + id + " not found")));
     }
 
     @Override

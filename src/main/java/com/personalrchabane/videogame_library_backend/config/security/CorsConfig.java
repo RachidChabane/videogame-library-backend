@@ -1,4 +1,4 @@
-package com.personalrchabane.videogame_library_backend.config;
+package com.personalrchabane.videogame_library_backend.config.security;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

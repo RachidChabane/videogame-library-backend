@@ -63,6 +63,11 @@ public class GameController {
         return ResponseEntity.ok(gameService.saveGame(gameCreateDTO));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<GameOutDTO> getGameById(@PathVariable Long id) {
+        return ResponseEntity.ok(gameService.findGameById(id));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<GameOutDTO> updateGame(
             @PathVariable Long id,

@@ -1,4 +1,4 @@
-package com.personalrchabane.videogame_library_backend.config;
+package com.personalrchabane.videogame_library_backend.config.general;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
