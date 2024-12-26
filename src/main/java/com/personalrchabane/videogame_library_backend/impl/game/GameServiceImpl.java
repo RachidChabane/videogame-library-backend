@@ -1,6 +1,7 @@
 package com.personalrchabane.videogame_library_backend.impl.game;
 
 import com.personalrchabane.videogame_library_backend.dto.game.in.GameCreateDTO;
+import com.personalrchabane.videogame_library_backend.dto.game.in.GameUpdateDTO;
 import com.personalrchabane.videogame_library_backend.dto.game.out.GameOutDTO;
 import com.personalrchabane.videogame_library_backend.mapper.game.GameMapper;
 import com.personalrchabane.videogame_library_backend.model.game.Game;
@@ -114,27 +115,15 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public GameOutDTO updateGame(Long id, GameCreateDTO gameCreateDTO) {
+    public GameOutDTO updateGame(Long id, GameUpdateDTO gameUpdateDTO) {
         // Vérifie si le jeu existe
         Game game = gameRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Game with ID " + id + " not found"));
 
         // Met à jour les données du jeu
-        game.setName(gameCreateDTO.getName());
-        game.setGenre(gameCreateDTO.getGenre());
-        game.setReleaseYear(gameCreateDTO.getReleaseYear());
-
-        // Associe le studio
-        GameStudio studio = gameStudioRepository.findById(gameCreateDTO.getStudioId())
-                .orElseThrow(() -> new IllegalArgumentException("Studio with ID " + gameCreateDTO.getStudioId() + " not found"));
-        game.setStudio(studio);
-
-        // Associe les plateformes
-        List<Platform> platforms = platformRepository.findAllById(gameCreateDTO.getPlatformIds());
-        if (platforms.size() != gameCreateDTO.getPlatformIds().size()) {
-            throw new IllegalArgumentException("One or more platforms not found");
-        }
-        game.setPlatforms(Set.copyOf(platforms));
+        game.setName(gameUpdateDTO.getName());
+        game.setGenre(gameUpdateDTO.getGenre());
+        game.setReleaseYear(gameUpdateDTO.getReleaseYear());
 
         // Sauvegarde et retourne le DTO
         return gameMapper.toGameOutDTO(gameRepository.save(game));

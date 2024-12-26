@@ -1,6 +1,7 @@
 package com.personalrchabane.videogame_library_backend.controller.game;
 
 import com.personalrchabane.videogame_library_backend.dto.game.in.GameCreateDTO;
+import com.personalrchabane.videogame_library_backend.dto.game.in.GameUpdateDTO;
 import com.personalrchabane.videogame_library_backend.dto.game.out.GameOutDTO;
 import com.personalrchabane.videogame_library_backend.service.game.GameService;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,8 +72,8 @@ public class GameController {
     @PutMapping("/{id}")
     public ResponseEntity<GameOutDTO> updateGame(
             @PathVariable Long id,
-            @RequestBody GameCreateDTO gameCreateDTO) {
-        return ResponseEntity.ok(gameService.updateGame(id, gameCreateDTO));
+            @RequestBody GameUpdateDTO gameUpdateDTO) {
+        return ResponseEntity.ok(gameService.updateGame(id, gameUpdateDTO));
     }
 
     @DeleteMapping("/{id}")
