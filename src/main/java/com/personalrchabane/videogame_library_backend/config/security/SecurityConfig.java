@@ -39,6 +39,7 @@ public class SecurityConfig {
         this.corsConfig = corsConfig;
     }
 
+    /*
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -60,6 +61,18 @@ public class SecurityConfig {
 
 
         return http.build();
+    }*/
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                //.cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/**").permitAll()
+                );
+
+        return http.build();
     }
 
     @Bean
@@ -79,4 +92,5 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
+
 }

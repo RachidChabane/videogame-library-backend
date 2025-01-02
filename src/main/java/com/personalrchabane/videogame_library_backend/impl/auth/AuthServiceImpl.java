@@ -31,7 +31,9 @@ public class AuthServiceImpl implements AuthService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password)
         );
-        return jwtService.generateToken(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return jwtService.generateToken(username, user.getEmail(), user.getRole());
     }
 
     @Override
@@ -50,6 +52,6 @@ public class AuthServiceImpl implements AuthService {
         user.setRole(Role.USER);
 
         userRepository.save(user);
-        return jwtService.generateToken(username);
+        return jwtService.generateToken(username, email, Role.USER);
     }
 }
